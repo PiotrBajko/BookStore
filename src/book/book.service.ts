@@ -8,7 +8,6 @@ import { exception } from 'console';
 
 @Injectable()
 export class BookService {
-    private books: Book[]  = [];
 
     constructor(@InjectModel('Book') private  bookModel:Model<Document & Book>)
     {}
@@ -40,4 +39,5 @@ export class BookService {
         const book = await (await this.bookModel.findById(bookID)).delete()
         return {status: "Successfuly deleted book."}
     }
+
 }
