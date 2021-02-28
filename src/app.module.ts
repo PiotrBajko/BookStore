@@ -6,9 +6,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
-  imports: [BookModule , MongooseModule.forRoot('mongodb://127.0.0.1:27017/nest',{useNewUrlParser: true}), UsersModule, AuthModule],
+  imports: [BookModule , MongooseModule.forRoot('mongodb://127.0.0.1:27017/nest',{useNewUrlParser: true}), UsersModule, AuthModule, OrderModule],
   controllers: [AppController, UsersController],
   providers: [AppService],
 })
