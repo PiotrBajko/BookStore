@@ -9,7 +9,7 @@ import { exception } from 'console';
 @Injectable()
 export class BookService {
 
-    constructor(@InjectModel('Book') private  bookModel:Model<Document & Book>)
+    constructor(@InjectModel('Book') public  bookModel:Model<Document & Book>)
     {}
     
 

@@ -8,6 +8,7 @@ import {MongooseModule} from '@nestjs/mongoose';
 @Module({
   imports: [MongooseModule.forFeature([{name:'Book',schema: BookSchema }])],
   controllers: [BookController],
-  providers: [BookService]
+  providers: [BookService],
+  exports:[BookService, MongooseModule.forFeature([{name: 'Book', schema: BookSchema}])]
 })
 export class BookModule {}
