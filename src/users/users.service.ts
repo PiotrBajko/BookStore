@@ -17,16 +17,16 @@ export class UsersService {
     }
 
     async getUser(userID){
-        const book = await this.userModel.findById(userID);
-        if(!book){
+        const user = await this.userModel.findById(userID);
+        if(!user){
            throw new exception('Cant find user');
         }
-        return book as User;
+        return user as User;
     }
 
     async deleteUser(userID){
         const user = await (await this.userModel.findById(userID)).delete()
-        return {status: "Successfuly deleted book."}
+        return {status: "Successfuly deleted user."}
     }
 
     async addUser(@Body() createUserDto: CreateUserDto){
@@ -37,9 +37,10 @@ export class UsersService {
         if (user){
             return {status:" User already exists in database"}
         }
+        const cash = 0
         
         if (password === password2){
-            const newUser = new this.userModel({username, password })
+            const newUser = new this.userModel({username, password,cash })
             return user as User;
         }
         return {status:"Passwords doesnt match "}
@@ -49,6 +50,13 @@ export class UsersService {
     async findUser(username){
         const user = await this.userModel.findOne({username : username})
         return user as User;
+    }
+
+    async chargeUp(userID, amountOfCash){
+        const user = await (await this.userModel.findById(userID))
+        const cashUpdated = user.cash + amountOfCash
+        const updatedUser = await this.userModel.findOneAndUpdate({userId:userID},{cash : cashUpdated})
+        return cashUpdated;
     }
     
 }

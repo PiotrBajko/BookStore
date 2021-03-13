@@ -6,6 +6,7 @@ import {CreateOrderDto} from './create-order.dto'
 import {BookService} from '../book/book.service'
 import {Book} from '../book/book.model'
 import {User} from '../users/users.model'
+import { exception } from 'console';
 @Injectable()
 export class OrderService {
     constructor(@InjectModel('Order') private  orderModel:mongoose.Model<mongoose.Document & Order>,@InjectModel('Book') public  bookModel:mongoose.Model<mongoose.Document & Book>, @InjectModel('User') private  userModel:mongoose.Model<mongoose.Document & User>)
@@ -19,12 +20,19 @@ export class OrderService {
 
     async addOrder(arrayOfBooks ,userID){
         var books  = []
-        var realUserID = mongoose.Types.ObjectId(userID)
-        var user = await this.userModel.findById(realUserID).exec()
+        var user = await this.userModel.findById(userID).exec()
+        var priceForAllBooks = 0
         for(var i=0;i<arrayOfBooks.length;i++){
             var realBookID =  mongoose.Types.ObjectId(arrayOfBooks[i])
             var book = await this.bookModel.findById(realBookID).exec()
+            priceForAllBooks = Number(book.price) + priceForAllBooks
             books.push(book)
+        }
+        if(user.cash < priceForAllBooks){
+            throw new exception("Not enought cash for order")
+        }
+        else{
+            user = await this.userModel.findOneAndUpdate({userId:userID},{cash : Number(user.cash) - priceForAllBooks})
         }
         const newOrder = new this.orderModel()
         newOrder.books = books

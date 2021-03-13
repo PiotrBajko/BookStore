@@ -2,6 +2,7 @@ import { Controller, Get , Param, Post, Delete, Query, Body, Request, UseGuards}
 import { UsersService } from './users.service';
 import { Console } from 'console';
 import {CreateUserDto} from "./create-user.dto"
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -26,5 +27,11 @@ export class UsersController {
     async addUser(@Body() createUserDto: CreateUserDto){
         const users = await this.userService.addUser(createUserDto);
         return users;
+    }
+    @UseGuards(JwtAuthGuard)
+    @Post('charge')
+    async chargeAccount(@Request() req){
+        const user = await this.userService.chargeUp(req.user.userId , req.body.amount)
+        return {amountOfCash: user}
     }
 }

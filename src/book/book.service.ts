@@ -30,7 +30,8 @@ export class BookService {
         const title = createBookDto.title
         const author = createBookDto.author
         const length = createBookDto.length
-        const newBook = new this.bookModel({title,author,length});
+        const price = createBookDto.price;
+        const newBook = new this.bookModel({title,author,length,price});
         const result = await newBook.save();
         return result.id as string;
     }
