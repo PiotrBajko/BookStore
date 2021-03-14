@@ -4,7 +4,6 @@ import {InjectModel} from '@nestjs/mongoose'
 import {Model, Document, Connection} from 'mongoose'
 import {CreateUserDto} from "./create-user.dto"
 import { exception } from 'console';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Injectable()
 export class UsersService {

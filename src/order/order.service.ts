@@ -18,6 +18,13 @@ export class OrderService {
         return orders;
     }
 
+    async getMyOrders(userID){
+        const user = await this.userModel.findById(userID).exec()
+        const orders = await this.orderModel.find({user:user}).exec()
+        return orders;
+
+    }
+
     async addOrder(arrayOfBooks ,userID){
         var books  = []
         var user = await this.userModel.findById(userID).exec()
@@ -25,8 +32,14 @@ export class OrderService {
         for(var i=0;i<arrayOfBooks.length;i++){
             var realBookID =  mongoose.Types.ObjectId(arrayOfBooks[i])
             var book = await this.bookModel.findById(realBookID).exec()
+            if (!book)
+            {
             priceForAllBooks = Number(book.price) + priceForAllBooks
             books.push(book)
+            }
+            else{
+                throw new exception("Book doesnt exist in database")
+            }
         }
         if(user.cash < priceForAllBooks){
             throw new exception("Not enought cash for order")
