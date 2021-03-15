@@ -1,4 +1,4 @@
-import { HttpException, Injectable, Body} from '@nestjs/common';
+import { HttpException, Injectable, Body, HttpStatus} from '@nestjs/common';
 import { resolve } from 'path';
 import {Book} from './book.model'
 import {InjectModel} from '@nestjs/mongoose'
@@ -21,9 +21,9 @@ export class BookService {
     async getBook(bookID){
         const book = await this.bookModel.findById(bookID);
         if(!book){
-           throw new exception('Cant find book');
+           throw new HttpException('Cant find book',HttpStatus.NOT_FOUND);
         }
-        return book as Book;
+        return book;
     }
 
     async addBook(@Body() createBookDto: CreateBookDto){

@@ -26,4 +26,11 @@ export class OrderController {
         const order = await this.orderService.getMyOrders(req.user.userId )
           return order
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete('cancel')
+    async cancelOrder(@Request() req){
+        const order = await this.orderService.cancelOrder(req.user.userId , req.body.orderID )
+        return order
+    }
 }

@@ -10,6 +10,9 @@ export class Order {
 
   @Prop({type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }]})
   books: Book[];
+
+  @Prop()
+  isActive: Boolean;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order)

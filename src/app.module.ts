@@ -9,7 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { OrderModule } from './order/order.module';
 
 @Module({
-  imports: [BookModule , MongooseModule.forRoot('mongodb://127.0.0.1:27017/nest',{useNewUrlParser: true}), UsersModule, AuthModule, OrderModule],
+  imports: [BookModule , MongooseModule.forRoot('mongodb://127.0.0.1:27017/bookstore',{useNewUrlParser: true}), UsersModule, AuthModule, OrderModule],
   controllers: [AppController, UsersController],
   providers: [AppService],
 })

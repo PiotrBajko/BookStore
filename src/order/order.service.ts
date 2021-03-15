@@ -1,4 +1,4 @@
-import { Injectable, Body } from '@nestjs/common';
+import { Injectable, Body, HttpException, HttpStatus } from '@nestjs/common';
 import {Order} from './order.model'
 import * as mongoose from 'mongoose';
 import {InjectModel} from '@nestjs/mongoose'
@@ -22,7 +22,6 @@ export class OrderService {
         const user = await this.userModel.findById(userID).exec()
         const orders = await this.orderModel.find({user:user}).exec()
         return orders;
-
     }
 
     async addOrder(arrayOfBooks ,userID){
@@ -32,20 +31,22 @@ export class OrderService {
         for(var i=0;i<arrayOfBooks.length;i++){
             var realBookID =  mongoose.Types.ObjectId(arrayOfBooks[i])
             var book = await this.bookModel.findById(realBookID).exec()
-            if (!book)
+            if (book)
             {
             priceForAllBooks = Number(book.price) + priceForAllBooks
             books.push(book)
             }
             else{
-                throw new exception("Book doesnt exist in database")
+                throw new HttpException('One of the books wasnt found', HttpStatus.NOT_FOUND);
             }
         }
         if(user.cash < priceForAllBooks){
-            throw new exception("Not enought cash for order")
+            throw new HttpException('Not enought cash', HttpStatus.NOT_FOUND);
         }
         else{
-            user = await this.userModel.findOneAndUpdate({userId:userID},{cash : Number(user.cash) - priceForAllBooks})
+            user = await this.userModel.findByIdAndUpdate(userID,{cash : Number(user.cash) - priceForAllBooks} ,  {
+                returnOriginal: true
+              })
         }
         const newOrder = new this.orderModel()
         newOrder.books = books
@@ -53,5 +54,28 @@ export class OrderService {
         const result = await newOrder.save()
         return result
 
+    }
+    //delete order and take back 80% of cash
+    async cancelOrder(userID,orderID){
+        var user = await this.userModel.findById(userID).exec()
+        var order = await this.orderModel.findById(orderID).exec()
+        if(!order){
+            throw new HttpException('Order doesnt exist', HttpStatus.NOT_FOUND);
+        }
+        if (String(userID) != String(order.user)){
+            throw new HttpException('Its not your order', HttpStatus.FORBIDDEN);
+        }
+        var cashBack  = 0
+        for( var i =0; i<order.books.length;i++){
+            var book = await this.bookModel.findById(order.books[i]).exec()
+            cashBack = cashBack + Number(book.price)
+        }
+        cashBack = cashBack * 0.8
+
+        user = await this.userModel.findByIdAndUpdate(userID,{cash : Number(user.cash) + cashBack} ,  {
+            returnOriginal: true
+          })
+        const result = await (await this.orderModel.findById(orderID)).delete()
+        return result
     }
 }

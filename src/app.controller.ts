@@ -12,6 +12,7 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+  
   @Post('auth/login')
   async login(@Request() req) {
     return this.authService.login(req.body);
