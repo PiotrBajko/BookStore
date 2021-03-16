@@ -20,8 +20,9 @@ export class OrderController {
         const order = await this.orderService.addOrder(req.body.arrayOfBooks, req.user.userId )
           return order
     }
+
     @UseGuards(JwtAuthGuard)
-    @Get()
+    @Get('my')
     async geyMyOrders(@Request() req){
         const order = await this.orderService.getMyOrders(req.user.userId )
           return order

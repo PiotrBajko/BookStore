@@ -5,6 +5,7 @@ import {Model, Document, Connection} from 'mongoose'
 import {CreateUserDto} from "./create-user.dto"
 import { exception } from 'console';
 import * as bcrypt from 'bcrypt';
+import * as mongoose from 'mongoose';
 
 @Injectable()
 export class UsersService {
@@ -17,6 +18,9 @@ export class UsersService {
     }
 
     async getUser(userID){
+        if (!mongoose.Types.ObjectId.isValid(userID)) {
+            throw new HttpException('Invalid objectID',HttpStatus.BAD_REQUEST)
+        }
         const user = await this.userModel.findById(userID);
         if(!user){
             throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -25,6 +29,9 @@ export class UsersService {
     }
 
     async deleteUser(userID){
+        if (!mongoose.Types.ObjectId.isValid(userID)) {
+            throw new HttpException('Invalid objectID',HttpStatus.BAD_REQUEST)
+        }
         const user = await (await this.userModel.findById(userID))
         if(user){
             const result =  await (await this.userModel.findById(userID)).delete()
@@ -46,7 +53,7 @@ export class UsersService {
             const result = await newUser.save()
             return result;
         }
-        throw new HttpException('User already exist in database', HttpStatus.FORBIDDEN);
+        throw new HttpException('Passwords doesnt match to each other', HttpStatus.BAD_REQUEST);
 
     }
 
@@ -58,6 +65,7 @@ export class UsersService {
         return user as User;
     }
 
+    //in this function i dont check if userID is valid, if it isnt program will return 401 due to UseGuards
     async chargeUp(userID, amountOfCash){
         const user = await (await this.userModel.findById(userID))
         if(amountOfCash < 0){
